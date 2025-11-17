@@ -1,23 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import Auth from "./components/Auth";
+import TodoApp from "./components/TodoApp";
+import "./index.css";
 
-function App() {
+function App(){
+  // currentUser stored in localStorage key 'todo_currentUser'
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(()=>{
+    const stored = localStorage.getItem("todo_currentUser");
+    if(stored) setCurrentUser(JSON.parse(stored));
+  },[]);
+
+  const handleLogin = (userObj) => {
+    setCurrentUser(userObj);
+    localStorage.setItem("todo_currentUser", JSON.stringify(userObj));
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem("todo_currentUser");
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{width:"100%"}}>
+      {currentUser ? (
+        <TodoApp user={currentUser} onLogout={handleLogout} onAuthChange={handleLogin} />
+      ) : (
+        <Auth onAuth={handleLogin} />
+      )}
     </div>
   );
 }
